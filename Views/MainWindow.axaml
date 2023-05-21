@@ -1,0 +1,182 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GraphicEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:converter="clr-namespace:GraphicEditor.ViewModels.Converters"
+		xmlns:models="clr-namespace:GraphicEditor.Models"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="GraphicEditor.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="GraphicEditor"
+		DragDrop.AllowDrop="True">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+	<Window.Resources>
+		<converter:ColorToBrushConverter x:Key="colorToBrushConverter"/>
+	</Window.Resources>
+	
+	<Grid ShowGridLines="False" RowDefinitions="0.05*,*" ColumnDefinitions="0.25*,0.60*,0.15*">
+		<DockPanel Grid.Row="0">
+			<Menu DockPanel.Dock="Top">
+				<MenuItem Name="menuExport" Header="Экспортировать">
+					<MenuItem Header="Экспортировать в PNG" Command="{Binding SavePNG}" CommandParameter="{Binding $parent[Window]}" />
+					<MenuItem Header="Экспортировать в JSON" Command="{Binding SaveJSON}" CommandParameter="{Binding $parent[Window]}"/>
+					<MenuItem Header="Экспортировать в XML" Command="{Binding SaveXML}" CommandParameter="{Binding $parent[Window]}"/>
+				</MenuItem>
+				<MenuItem Name="menuImport" Header="Импортировать">
+					<MenuItem Header="Импортировать из JSON" Command="{Binding LoadJSON}" CommandParameter="{Binding $parent[Window]}"/>
+					<MenuItem Header="Импортировать из XML" Command="{Binding LoadXML}" CommandParameter="{Binding $parent[Window]}"/>
+				</MenuItem>
+			</Menu>
+		</DockPanel>
+		<Border Grid.Row="1" Grid.Column="0" BorderThickness="1" BorderBrush="Black">
+			<Grid ShowGridLines="{Binding $parent.ShowGridLines}" RowDefinitions="29, *, 29">
+				<Grid.Styles>
+					<StyleInclude Source="/Assets/CustomStyles.axaml"/>
+				</Grid.Styles>
+				<ComboBox Name="comboBoxShape" Grid.Row="0" SelectedItem="{Binding Content}" Items="{Binding VmbaseCollection}">
+					<ComboBox.DataTemplates>
+						<DataTemplate>
+							<TextBlock Text="{Binding ViewName}"/>
+						</DataTemplate>
+					</ComboBox.DataTemplates>
+				</ComboBox>
+
+				<ContentControl VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"
+						Grid.Row="1" Content="{Binding Content}"/>
+				<Grid Grid.Row="2" ColumnDefinitions="*,*">
+					<Button Name="buttonAdd" Grid.Column="0"
+							Content="Добавить" Command="{Binding buttonAdd}"></Button>
+					<Button Name="buttonClear" Grid.Column="1"
+							Content="Сброс" Command="{Binding buttonClear}"></Button>
+				</Grid>
+			</Grid>	
+		</Border>
+		<Border Grid.Row="1" Grid.Column="1" BorderThickness="1" BorderBrush="Black">
+			<ItemsControl Items="{Binding Shapes}" PointerPressed="PointerPressedOnCanvas">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Canvas Name="canvas" Width="{Binding $parent.Width}" Height="{Binding $parent.Height}"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.DataTemplates>
+					<DataTemplate DataType="{x:Type	models:PaintStraightLine}">
+						<Line StartPoint="{Binding StartPoint}"
+							  EndPoint="{Binding EndPoint}"
+							  Stroke="{Binding StrokeColor, Converter={StaticResource colorToBrushConverter}}"
+							  StrokeThickness="{Binding StrokeThickness}">
+							<Line.RenderTransform>
+								<TransformGroup>
+									<RotateTransform CenterX="{Binding Rotate.CenterX}" CenterY="{Binding Rotate.CenterY}"
+												 Angle="{Binding Rotate.Angle}"/>
+									<ScaleTransform ScaleX="{Binding Scale.ScaleX}" ScaleY="{Binding Scale.ScaleY}"/>
+									<SkewTransform AngleX="{Binding Skew.AngleX}" AngleY="{Binding Skew.AngleY}"/>
+								</TransformGroup>
+							</Line.RenderTransform>
+						</Line>
+					</DataTemplate>
+
+					<DataTemplate DataType="{x:Type	models:PaintPolyline}">
+						<Polyline Points="{Binding Points}"
+							  Stroke="{Binding StrokeColor, Converter={StaticResource colorToBrushConverter}}"
+							  StrokeThickness="{Binding StrokeThickness}">
+							<Polyline.RenderTransform>
+								<TransformGroup>
+									<RotateTransform CenterX="{Binding Rotate.CenterX}" CenterY="{Binding Rotate.CenterY}"
+												 Angle="{Binding Rotate.Angle}"/>
+									<ScaleTransform ScaleX="{Binding Scale.ScaleX}" ScaleY="{Binding Scale.ScaleY}"/>
+									<SkewTransform AngleX="{Binding Skew.AngleX}" AngleY="{Binding Skew.AngleY}"/>
+								</TransformGroup>
+							</Polyline.RenderTransform>
+						</Polyline>
+					</DataTemplate>
+					<DataTemplate DataType="{x:Type	models:PaintPolygon}">
+						<Polygon Points="{Binding Points}"
+							  Fill="{Binding FillColor, Converter={StaticResource colorToBrushConverter}}"
+							  Stroke="{Binding StrokeColor, Converter={StaticResource colorToBrushConverter}}"
+							  StrokeThickness="{Binding StrokeThickness}">
+							<Polygon.RenderTransform>
+								<TransformGroup>
+									<RotateTransform CenterX="{Binding Rotate.CenterX}" CenterY="{Binding Rotate.CenterY}"
+												 Angle="{Binding Rotate.Angle}"/>
+									<ScaleTransform ScaleX="{Binding Scale.ScaleX}" ScaleY="{Binding Scale.ScaleY}"/>
+									<SkewTransform AngleX="{Binding Skew.AngleX}" AngleY="{Binding Skew.AngleY}"/>
+								</TransformGroup>
+							</Polygon.RenderTransform>
+						</Polygon>
+					</DataTemplate>
+					<DataTemplate DataType="{x:Type	models:PaintRectangle}">
+						<Rectangle  Width="{Binding Width}" Height="{Binding Height}"
+							  Fill="{Binding FillColor, Converter={StaticResource colorToBrushConverter}}"
+							  Stroke="{Binding StrokeColor, Converter={StaticResource colorToBrushConverter}}"
+							  StrokeThickness="{Binding StrokeThickness}">
+							<Rectangle.RenderTransform>
+								<TransformGroup>
+									<TranslateTransform X="{Binding StartPoint.X}" Y="{Binding StartPoint.Y}"/>
+									<RotateTransform CenterX="{Binding Rotate.CenterX}" CenterY="{Binding Rotate.CenterY}"
+												 Angle="{Binding Rotate.Angle}"/>
+									<ScaleTransform ScaleX="{Binding Scale.ScaleX}" ScaleY="{Binding Scale.ScaleY}"/>
+									<SkewTransform AngleX="{Binding Skew.AngleX}" AngleY="{Binding Skew.AngleY}"/>
+								</TransformGroup>
+							</Rectangle.RenderTransform>
+						</Rectangle>
+					</DataTemplate>
+					<DataTemplate DataType="{x:Type	models:PaintEllipse}">
+						<Ellipse  Width="{Binding Width}" Height="{Binding Height}"
+							  Fill="{Binding FillColor, Converter={StaticResource colorToBrushConverter}}"
+							  Stroke="{Binding StrokeColor, Converter={StaticResource colorToBrushConverter}}"
+							  StrokeThickness="{Binding StrokeThickness}">
+							<Ellipse.RenderTransform>
+								<TransformGroup>
+									<TranslateTransform X="{Binding StartPoint.X}" Y="{Binding StartPoint.Y}"/>
+									<RotateTransform CenterX="{Binding Rotate.CenterX}" CenterY="{Binding Rotate.CenterY}"
+												 Angle="{Binding Rotate.Angle}"/>
+									<ScaleTransform ScaleX="{Binding Scale.ScaleX}" ScaleY="{Binding Scale.ScaleY}"/>
+									<SkewTransform AngleX="{Binding Skew.AngleX}" AngleY="{Binding Skew.AngleY}"/>
+								</TransformGroup>
+							</Ellipse.RenderTransform>
+						</Ellipse>
+					</DataTemplate>
+					<DataTemplate DataType="{x:Type	models:PaintPath}">
+						<Path Data="{Binding Data}"
+							  Fill="{Binding FillColor, Converter={StaticResource colorToBrushConverter}}"
+							  Stroke="{Binding StrokeColor, Converter={StaticResource colorToBrushConverter}}"
+							  StrokeThickness="{Binding StrokeThickness}">
+							<Path.RenderTransform>
+								<TransformGroup>
+									<TranslateTransform X="{Binding StartPoint.X}" Y="{Binding StartPoint.Y}"/>
+									<RotateTransform CenterX="{Binding Rotate.CenterX}" CenterY="{Binding Rotate.CenterY}"
+												 Angle="{Binding Rotate.Angle}"/>
+									<ScaleTransform ScaleX="{Binding Scale.ScaleX}" ScaleY="{Binding Scale.ScaleY}"/>
+									<SkewTransform AngleX="{Binding Skew.AngleX}" AngleY="{Binding Skew.AngleY}"/>
+								</TransformGroup>
+							</Path.RenderTransform>
+						</Path>
+					</DataTemplate>
+				</ItemsControl.DataTemplates>
+			</ItemsControl>
+		</Border>
+		<Border Grid.Row="1" Grid.Column="2" BorderThickness="1" BorderBrush="Black">
+			<ListBox Name="listBoxShapes" Items="{Binding Shapes}">
+				<ListBox.Styles>
+					<StyleInclude Source="/Assets/CustomStyles.axaml"/>
+				</ListBox.Styles>
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<Grid ColumnDefinitions="4*, *" Margin="0">
+							<TextBlock Grid.Column="0" Text="{Binding Name}" />
+							<Button Name="buttonDeleteShape" Grid.Column="1" Command="{Binding $parent[ListBox].DataContext.buttonDelete}" CommandParameter="{Binding}">
+								<Image Height="{Binding $parent.Height}" Width="{Binding $parent.Height}" Source="\Assets\button-delete.png"/>
+							</Button>
+						</Grid>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</Border>
+	</Grid>
+</Window>

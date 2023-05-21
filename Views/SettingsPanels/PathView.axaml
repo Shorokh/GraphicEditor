@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converter="clr-namespace:GraphicEditor.ViewModels.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="GraphicEditor.Views.SettingsPanels.PathView">
+	<UserControl.Resources>
+		<converter:ColorToBrushConverter x:Key="colorToBrushConverter"/>
+		<converter:StringToPointConverter x:Key="stringToPointConverter"/>
+	</UserControl.Resources>
+
+	<Grid ColumnDefinitions="0.4*, 0.6*" RowDefinitions="*,*,*,*,*,*,*,*,*,*" HorizontalAlignment="Stretch" Margin="5,25,5,5">
+		<Grid.Styles>
+			<StyleInclude Source="/Assets/SettingsPanelStyles.axaml"/>
+		</Grid.Styles>
+		<TextBlock Grid.Column="0" Grid.Row="0" Text="Имя:"/>
+		<TextBlock Grid.Column="0" Grid.Row="1" Text="Команды:"/>
+		<TextBlock Grid.Column="0" Grid.Row="3" Text="Цвет линии:"/>
+		<TextBlock Grid.Column="0" Grid.Row="4" Text="Толщина линии:"/>
+		<TextBlock Grid.Column="0" Grid.Row="5" Text="Цвет заливки:"/>
+		<TextBlock Grid.Column="0" Grid.Row="6" Text="Угол поворота:"/>
+		<TextBlock Grid.Column="0" Grid.Row="7" Text="Ось поворота:"/>
+		<TextBlock Grid.Column="0" Grid.Row="8" Text="Масштабирование:"/>
+		<TextBlock Grid.Column="0" Grid.Row="9" Text="Отклонение:"/>
+		<TextBox Name="textBoxName" Grid.Column="1" Grid.Row="0" Text="{Binding Name}"/>
+		<TextBox Name="textBoxCommandPath" Grid.Column="1" Grid.Row="1" Text="{Binding Commands}"/>
+		<ComboBox Name="comboBoxColor" Grid.Column="1" Grid.Row="3" Items="{Binding Colors}" SelectedItem="{Binding StrokeColor}">
+			<ComboBox.DataTemplates>
+				<DataTemplate>
+					<Rectangle Fill="{Binding Color, Converter={StaticResource colorToBrushConverter}}" Width="100" Height="15"/>
+				</DataTemplate>
+			</ComboBox.DataTemplates>
+		</ComboBox>
+		<NumericUpDown Name="numericUpDownStroke" Grid.Column="1" Grid.Row="4" Value="{Binding StrokeThickness}"/>
+		<ComboBox Name="comboBoxFillColor" Grid.Column="1" Grid.Row="5" Items="{Binding Colors}" SelectedItem="{Binding FillColor}">
+			<ComboBox.DataTemplates>
+				<DataTemplate>
+					<Rectangle Fill="{Binding Color, Converter={StaticResource colorToBrushConverter}}" Width="100" Height="15"/>
+				</DataTemplate>
+			</ComboBox.DataTemplates>
+		</ComboBox>
+		<TextBox Name="textBoxRenderTransformAngle" Grid.Column="1" Grid.Row="6" Text="{Binding RotateAngle}"/>
+		<TextBox Name="textBoxRotateCenter" Grid.Column="1" Grid.Row="7" Text="{Binding RotateCenter, Converter={StaticResource stringToPointConverter}}"/>
+		<TextBox Name="textBoxScaleTransform" Grid.Column="1" Grid.Row="8" Text="{Binding Scale, Converter={StaticResource stringToPointConverter}}"/>
+		<TextBox Name="textBoxSkewTransform" Grid.Column="1" Grid.Row="9" Text="{Binding Skew, Converter={StaticResource stringToPointConverter}}"/>
+	</Grid>
+</UserControl>
